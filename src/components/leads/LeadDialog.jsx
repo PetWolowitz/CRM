@@ -29,7 +29,7 @@ export function LeadDialog({ lead, onSave, trigger }) {
       <DialogTrigger asChild>
         {trigger}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{lead ? 'Modifica Lead' : 'Nuovo Lead'}</DialogTitle>
         </DialogHeader>

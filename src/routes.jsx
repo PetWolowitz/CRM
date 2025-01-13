@@ -6,7 +6,10 @@ import { Customers } from './pages/Customers';
 import { Deals } from './pages/Deals';
 import { Tasks } from './pages/Tasks';
 import { Settings } from './pages/Settings';
+import { CalendarPage } from './pages/Calendar';
 import { Login } from './pages/Login';
+import { Invoices } from './pages/Invoices';
+import { Error404 } from './pages/Error404';
 import { useAuth } from './hooks/use-auth';
 
 export function AppRoutes() {
@@ -37,9 +40,13 @@ export function AppRoutes() {
         <Route path="contacts" element={<Contacts />} />
         <Route path="customers" element={<Customers />} />
         <Route path="deals" element={<Deals />} />
+        <Route path="calendar" element={<CalendarPage />} />
         <Route path="tasks" element={<Tasks />} />
+        <Route path="invoices" element={<Invoices />} />
         <Route path="settings" element={<Settings />} />
       </Route>
+
+      <Route path="*" element={<Error404 />} />
     </Routes>
   );
 }

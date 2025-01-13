@@ -2,13 +2,26 @@ import { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, DollarSign, Calendar, Mail, Settings, MessageSquare } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Plus, DollarSign, Calendar, Mail, Settings, MessageSquare, Trash2, CheckCircle } from 'lucide-react';
 import { LeadDialog } from '@/components/leads/LeadDialog';
 import { EmailTemplate } from '@/components/leads/EmailTemplate';
 import { Timeline } from '@/components/leads/Timeline';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const initialColumns = {
   'col-1': {
@@ -76,10 +89,35 @@ const initialLeads = {
   },
 };
 
+const mockActivities = [
+  {
+    type: 'status',
+    title: 'Lead spostato in Contattato',
+    description: 'Il lead è stato spostato da Nuovo Lead a Contattato',
+    date: '2 ore fa',
+  },
+  {
+    type: 'email',
+    title: 'Email inviata',
+    description: 'Inviata proposta commerciale',
+    date: 'Ieri',
+  },
+  {
+    type: 'note',
+    title: 'Nota aggiunta',
+    description: 'Cliente interessato al pacchetto enterprise',
+    date: '2 giorni fa',
+  },
+];
+
 export function Deals() {
   const [columns, setColumns] = useState(initialColumns);
   const [leads, setLeads] = useState(initialLeads);
   const [selectedLead, setSelectedLead] = useState(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   const onDragEnd = (result) => {
     const { destination, source, draggableId } = result;
@@ -143,48 +181,111 @@ export function Deals() {
   };
 
   const handleSaveLead = (leadData) => {
-    const newLead = {
-      ...leadData,
-      id: leadData.id || String(Date.now()),
-    };
-
-    setLeads((prev) => ({
-      ...prev,
-      [newLead.id]: newLead,
-    }));
-
-    if (!leadData.id) {
-      const firstColumn = Object.values(columns)[0];
-      setColumns((prev) => ({
+    if (leadData.id) {
+      setLeads(prev => ({
         ...prev,
-        [firstColumn.id]: {
-          ...firstColumn,
-          leadIds: [newLead.id, ...firstColumn.leadIds],
-        },
+        [leadData.id]: leadData
       }));
+      toast({
+        title: "Lead aggiornato",
+        description: "Le modifiche sono state salvate con successo",
+      });
+    } else {
+      const newLead = {
+        ...leadData,
+        id: Date.now().toString(),
+      };
+      setLeads(prev => ({
+        ...prev,
+        [newLead.id]: newLead
+      }));
+      setColumns(prev => ({
+        ...prev,
+        'col-1': {
+          ...prev['col-1'],
+          leadIds: [newLead.id, ...prev['col-1'].leadIds]
+        }
+      }));
+      toast({
+        title: "Lead creato",
+        description: "Il nuovo lead è stato creato con successo",
+      });
     }
   };
 
-  const mockActivities = [
-    {
-      type: 'status',
-      title: 'Lead spostato in Contattato',
-      description: 'Il lead è stato spostato da Nuovo Lead a Contattato',
-      date: '2 ore fa',
-    },
-    {
-      type: 'email',
-      title: 'Email inviata',
-      description: 'Inviata proposta commerciale',
-      date: 'Ieri',
-    },
-    {
-      type: 'note',
-      title: 'Nota aggiunta',
-      description: 'Cliente interessato al pacchetto enterprise',
-      date: '2 giorni fa',
-    },
-  ];
+  const handleDeleteLead = (lead) => {
+    setSelectedLead(lead);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    // Rimuovi il lead da tutte le colonne
+    const newColumns = {};
+    Object.entries(columns).forEach(([columnId, column]) => {
+      newColumns[columnId] = {
+        ...column,
+        leadIds: column.leadIds.filter(id => id !== selectedLead.id)
+      };
+    });
+    setColumns(newColumns);
+
+    // Rimuovi il lead dallo stato
+    const newLeads = { ...leads };
+    delete newLeads[selectedLead.id];
+    setLeads(newLeads);
+
+    setIsDeleteDialogOpen(false);
+    setSelectedLead(null);
+    toast({
+      title: "Lead eliminato",
+      description: "Il lead è stato eliminato con successo",
+    });
+  };
+
+  const handleCompleteDeal = (lead) => {
+    setSelectedLead(lead);
+    setIsCompleteDialogOpen(true);
+  };
+
+  const confirmComplete = () => {
+    // Rimuovi il lead da tutte le colonne
+    const newColumns = {};
+    Object.entries(columns).forEach(([columnId, column]) => {
+      newColumns[columnId] = {
+        ...column,
+        leadIds: column.leadIds.filter(id => id !== selectedLead.id)
+      };
+    });
+    setColumns(newColumns);
+
+    // Rimuovi il lead dallo stato
+    const newLeads = { ...leads };
+    delete newLeads[selectedLead.id];
+    setLeads(newLeads);
+
+    // Crea una nuova fattura
+    const newInvoice = {
+      number: `INV-${new Date().getFullYear()}-${String(Date.now()).slice(-3)}`,
+      dealId: selectedLead.id,
+      dealTitle: selectedLead.title,
+      amount: selectedLead.value,
+      completedAt: new Date(),
+      dueDate: new Date(new Date().setDate(new Date().getDate() + 30)),
+      status: 'pending',
+      notes: selectedLead.description,
+    };
+
+    // Naviga alla pagina fatture
+    navigate('/invoices', { 
+      state: { 
+        newInvoice,
+        message: 'Trattativa completata con successo! La fattura è stata generata.'
+      }
+    });
+
+    setIsCompleteDialogOpen(false);
+    setSelectedLead(null);
+  };
 
   return (
     <div className="space-y-6">
@@ -242,6 +343,7 @@ export function Deals() {
                     <div className="space-y-3">
                       {column.leadIds.map((leadId, index) => {
                         const lead = leads[leadId];
+                        if (!lead) return null;
                         return (
                           <Draggable
                             key={lead.id}
@@ -256,7 +358,6 @@ export function Deals() {
                                     {...provided.draggableProps}
                                     {...provided.dragHandleProps}
                                     className="p-4 hover:shadow-md transition-shadow cursor-pointer"
-                                    onClick={() => setSelectedLead(lead)}
                                   >
                                     <h3 className="font-medium mb-2">{lead.title}</h3>
                                     <p className="text-sm text-muted-foreground mb-3">
@@ -285,7 +386,7 @@ export function Deals() {
                                         <TabsTrigger value="timeline">Timeline</TabsTrigger>
                                         <TabsTrigger value="email">Email</TabsTrigger>
                                       </TabsList>
-                                      <TabsContent value="details" className="mt-4">
+                                      <TabsContent value="details" className="mt-4 space-y-4">
                                         <LeadDialog
                                           lead={lead}
                                           onSave={handleSaveLead}
@@ -295,6 +396,22 @@ export function Deals() {
                                             </Button>
                                           }
                                         />
+                                        <Button 
+                                          variant="default"
+                                          className="w-full"
+                                          onClick={() => handleCompleteDeal(lead)}
+                                        >
+                                          <CheckCircle className="h-4 w-4 mr-2" />
+                                          Concludi Trattativa
+                                        </Button>
+                                        <Button 
+                                          variant="destructive" 
+                                          className="w-full"
+                                          onClick={() => handleDeleteLead(lead)}
+                                        >
+                                          <Trash2 className="h-4 w-4 mr-2" />
+                                          Elimina Trattativa
+                                        </Button>
                                       </TabsContent>
                                       <TabsContent value="timeline" className="mt-4">
                                         <Timeline activities={mockActivities} />
@@ -319,6 +436,40 @@ export function Deals() {
           ))}
         </DragDropContext>
       </div>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sei sicuro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Questa azione non può essere annullata. La trattativa verrà eliminata permanentemente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annulla</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Elimina
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={isCompleteDialogOpen} onOpenChange={setIsCompleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Concludi Trattativa</AlertDialogTitle>
+            <AlertDialogDescription>
+              Confermando, la trattativa verrà marcata come conclusa e verrà generata una fattura.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annulla</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmComplete}>
+              Conferma
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

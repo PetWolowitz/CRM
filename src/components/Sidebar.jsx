@@ -6,7 +6,9 @@ import {
   BadgeDollarSign, 
   CheckSquare,
   Settings,
-  UserCheck
+  UserCheck,
+  Calendar,
+  FileText
 } from 'lucide-react';
 
 const navigation = [
@@ -14,7 +16,9 @@ const navigation = [
   { name: 'Contatti', href: '/contacts', icon: Users },
   { name: 'Clienti', href: '/customers', icon: UserCheck },
   { name: 'Trattative', href: '/deals', icon: BadgeDollarSign },
+  { name: 'Calendario', href: '/calendar', icon: Calendar },
   { name: 'Attività', href: '/tasks', icon: CheckSquare },
+  { name: 'Fatture', href: '/invoices', icon: FileText },
   { name: 'Impostazioni', href: '/settings', icon: Settings },
 ];
 
