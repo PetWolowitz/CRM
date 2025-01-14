@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,6 +34,9 @@ export function EmailTemplate({ lead }) {
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Invia Email</DialogTitle>
+          <DialogDescription>
+            Seleziona un template e personalizza il contenuto dell'email.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">

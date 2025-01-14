@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search, Mail, Phone, Building, Calendar } from 'lucide-react';
 import { ContactDialog } from '@/components/contacts/ContactDialog';
 import { ContentCard } from '@/components/ui/shared/ContentCard';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,6 +46,16 @@ export function Customers() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Gestisci il nuovo cliente convertito
+  useEffect(() => {
+    if (location.state?.newCustomer) {
+      setCustomers(prev => [...prev, location.state.newCustomer]);
+      // Pulisci lo state per evitare duplicati al refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleDeleteCustomer = (customer) => {
     setSelectedCustomer(customer);

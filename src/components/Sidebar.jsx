@@ -1,5 +1,6 @@
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { cn } from '../lib/utils';
+import { cn } from '@/lib/utils';
 import { 
   LayoutDashboard, 
   Users, 
@@ -22,11 +23,11 @@ const navigation = [
   { name: 'Impostazioni', href: '/settings', icon: Settings },
 ];
 
-export function Sidebar({ onNavigate }) {
+function Sidebar({ onNavigate }) {
   const location = useLocation();
 
   return (
-    <div className="flex h-full w-64 flex-col border-r bg-card">
+    <div className="flex h-full w-64 flex-col bg-gradient-to-b from-[#69247C] to-[#FAC67A] overflow-hidden">
       <nav className="flex-1 space-y-1 px-2 py-4">
         {navigation.map((item) => {
           const isActive = location.pathname === item.href;
@@ -36,16 +37,16 @@ export function Sidebar({ onNavigate }) {
               to={item.href}
               onClick={onNavigate}
               className={cn(
-                'group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                'group flex items-center rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200',
                 isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                  ? 'bg-white/20 text-white backdrop-blur-sm'
+                  : 'text-white/80 hover:bg-white/10 hover:text-white'
               )}
             >
               <item.icon
                 className={cn(
-                  'mr-3 h-5 w-5',
-                  isActive ? 'text-primary-foreground' : 'text-muted-foreground'
+                  'mr-3 h-5 w-5 transition-colors duration-200',
+                  isActive ? 'text-white' : 'text-white/80 group-hover:text-white'
                 )}
               />
               {item.name}
@@ -56,3 +57,5 @@ export function Sidebar({ onNavigate }) {
     </div>
   );
 }
+
+export default Sidebar;

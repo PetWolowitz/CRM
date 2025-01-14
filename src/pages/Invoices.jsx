@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Search, Download, FileText, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'react-router-dom';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 
 // Funzione per generare ID univoci
@@ -185,6 +185,9 @@ export function Invoices() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Nuova Fattura</DialogTitle>
+            <DialogDescription>
+              Inserisci i dettagli della nuova fattura da creare.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">

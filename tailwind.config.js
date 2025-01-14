@@ -13,11 +13,11 @@ module.exports = {
         '2xl': '6rem',
       },
       screens: {
-        sm: '640px',    // Mobile landscape
-        md: '768px',    // Tablets
-        lg: '1024px',   // Desktop
-        xl: '1280px',   // Large desktop
-        '2xl': '1536px' // Extra large desktop
+        sm: '640px',
+        md: '768px',
+        lg: '1024px',
+        xl: '1280px',
+        '2xl': '1536px'
       },
     },
     extend: {
@@ -34,6 +34,18 @@ module.exports = {
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
+        },
+        tertiary: {
+          DEFAULT: "hsl(var(--tertiary))",
+          foreground: "hsl(var(--tertiary-foreground))",
+        },
+        quaternary: {
+          DEFAULT: "hsl(var(--quaternary))",
+          foreground: "hsl(var(--quaternary-foreground))",
+        },
+        quinary: {
+          DEFAULT: "hsl(var(--quinary))",
+          foreground: "hsl(var(--quinary-foreground))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
